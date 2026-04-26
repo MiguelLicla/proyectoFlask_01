@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertidor Celsius a Fahrenheit</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+        }
+        .contenedor {
+            width: 320px;
+            margin: 100px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        h2 {
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .resultado {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="contenedor">
+        <h2>Celsius → Fahrenheit</h2>
+        <input type="number" id="celsius" placeholder="Ingresa grados Celsius" step="any">
+        <button onclick="convertir()">Convertir</button>
+        <div class="resultado" id="resultado"></div>
+    </div>
+
+    <script>
+        async function convertir() {
+            const celsius = document.getElementById("celsius").value;
+            const res = await fetch("/convertir", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ celsius: parseFloat(celsius) })
+            });
+            const data = await res.json();
+            document.getElementById("resultado").innerText =
+                celsius + " °C = " + data.fahrenheit + " °F";
+        }
+    </script>
+</body>
+</html>

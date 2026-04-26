@@ -31,6 +31,11 @@ def login():
         return render_template("login.html", mensaje="Usuario o contraseña incorrectos")
 
 
+@app.route("/convertir", methods=["GET"])
+def convertir_page():
+    return render_template("convertir.html")
+
+
 @app.route("/convertir", methods=["POST"])
 def convertir():
     datos = request.get_json()
