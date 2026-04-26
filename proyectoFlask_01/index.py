@@ -4,15 +4,17 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-# Modelo TensorFlow: aprende la conversión Celsius -> Fahrenheit
-celsius    = np.array([-40, -10,  0,  8, 15,  22,  38], dtype=float)
-fahrenheit = np.array([-40,  14, 32, 46.4, 59, 71.6, 100.4], dtype=float)
+# Carga el modelo preentrenado TFLite
+interp = tf.lite.Interpreter(model_path="model_c2f.tflite")
+interp.allocate_tensors()
+inp_det = interp.get_input_details()
+out_det = interp.get_output_details()
 
-modelo = tf.keras.Sequential([
-    tf.keras.layers.Dense(units=1, input_shape=[1])
-])
-modelo.compile(optimizer=tf.keras.optimizers.Adam(0.5), loss='mean_squared_error')
-modelo.fit(celsius, fahrenheit, epochs=500, verbose=0)
+
+def predecir(celsius):
+    interp.set_tensor(inp_det[0]['index'], np.array([[celsius]], dtype=np.float32))
+    interp.invoke()
+    return float(interp.get_tensor(out_det[0]['index'])[0][0])
 
 
 @app.route("/")
@@ -40,8 +42,8 @@ def convertir_page():
 def convertir():
     datos = request.get_json()
     celsius_val = float(datos.get("celsius", 0))
-    resultado = modelo.predict(np.array([celsius_val]), verbose=0)[0][0]
-    return jsonify({"celsius": celsius_val, "fahrenheit": round(float(resultado), 2)})
+    fahrenheit_val = predecir(celsius_val)
+    return jsonify({"celsius": celsius_val, "fahrenheit": round(fahrenheit_val, 2)})
 
 
 if __name__ == "__main__":
