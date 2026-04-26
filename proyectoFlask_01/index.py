@@ -1,23 +1,21 @@
 import numpy as np
-import tflite_runtime.interpreter as tflite
+from sklearn.linear_model import LinearRegression
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
 
+# Modelo ML: regresion lineal Celsius -> Fahrenheit
+celsius    = np.array([-40, -10,  0,  8, 15,  22,  38], dtype=float).reshape(-1, 1)
+fahrenheit = np.array([-40,  14, 32, 46.4, 59, 71.6, 100.4], dtype=float)
 
-# Carga el modelo preentrenado TFLite (TensorFlow Lite)
-interp = tflite.Interpreter(model_path="model_c2f.tflite")
-interp.allocate_tensors()
-inp_det = interp.get_input_details()
-out_det = interp.get_output_details()
+modelo = LinearRegression()
+modelo.fit(celsius, fahrenheit)
 
 
 def predecir(celsius_val):
-    interp.set_tensor(inp_det[0]['index'], np.array([[celsius_val]], dtype=np.float32))
-    interp.invoke()
-    return float(interp.get_tensor(out_det[0]['index'])[0][0])
+    return float(modelo.predict(np.array([[celsius_val]]))[0])
 
 
 @app.route("/")
