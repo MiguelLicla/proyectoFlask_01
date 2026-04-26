@@ -6,6 +6,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+
 # Carga el modelo preentrenado TFLite (TensorFlow Lite)
 interp = tflite.Interpreter(model_path="model_c2f.tflite")
 interp.allocate_tensors()
